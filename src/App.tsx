@@ -12,8 +12,8 @@ function App() {
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [showFireworks, setShowFireworks] = useState<boolean>(false);
-  // const [selectedNumbers, setSelectedNumbers] = useState<number[]>([1, 7]);
-  const selectedNumbers = [1, 7];
+  // const [selectedNumbers, setSelectedNumbers] = useState<number[]>([1, 7, 19,21,24,32,42,44,50,58,74,78,81,85, 89, 90, 91, 98,99,100]);
+  const selectedNumbers = [1, 7, 19,21,24,32,42,44,50,58,74,78,81,85, 89, 90, 91, 98,99,100];
   const [gridWidth, setGridWidth] = useState<number>(0);
   const [gridHeight, setGridHeight] = useState<number>(0);
   const [guessed, setGuessed] = useState<boolean>(false);

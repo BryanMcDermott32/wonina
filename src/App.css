@@ -30,8 +30,8 @@ header {
 div.is-disabled
 {
   pointer-events: none;
-  opacity: 0.5;
-  color: crimson;
+  opacity: 0.3;
+  background-color: rgba(251, 0, 0, 0.505);
   /* text-decoration: line-through; */
 }
 
