@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { FixedSizeGrid as Grid } from "react-window";
-// import { useWindowSize } from 'react-use';
 import Confetti from "react-confetti";
 import "./App.css";
 
@@ -10,19 +9,19 @@ const paddingRem = 2;
 const cellSize = 60;
 
 function App() {
-  const [selectedNumber, setSelectedNumber] = useState(null);
-  const [result, setResult] = useState(null);
-  const [showFireworks, setShowFireworks] = useState(false);
-  const [selectedNumbers, setSelectedNumbers] = useState([1,7]);
-  const [gridWidth, setGridWidth] = useState(0);
-  const [gridHeight, setGridHeight] = useState(0);
-  const [guessed, setGuessed] = useState(false);
-  // const { width, height } = useWindowSize();
+  const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
+  const [result, setResult] = useState<string | null>(null);
+  const [showFireworks, setShowFireworks] = useState<boolean>(false);
+  // const [selectedNumbers, setSelectedNumbers] = useState<number[]>([1, 7]);
+  const selectedNumbers = [1, 7];
+  const [gridWidth, setGridWidth] = useState<number>(0);
+  const [gridHeight, setGridHeight] = useState<number>(0);
+  const [guessed, setGuessed] = useState<boolean>(false);
 
   const updateGridSize = () => {
     const paddingPx = paddingRem * 16 * 2; // 2rem on left + 2rem on right = 64px
-    setGridWidth(window.innerWidth - paddingPx);
-    setGridHeight(window.innerHeight - paddingPx - 100); // 2rem top/bottom + approx. header
+    setGridWidth(Math.max(window.innerWidth - paddingPx, cellSize));
+    setGridHeight(Math.max(window.innerHeight - paddingPx - 100, cellSize));
   };
 
   useEffect(() => {
@@ -31,42 +30,55 @@ function App() {
     return () => window.removeEventListener("resize", updateGridSize);
   }, []);
 
-  const columnCount = Math.floor(gridWidth / cellSize);
+  // Prevent division by zero
+  const columnCount = Math.max(1, Math.floor(gridWidth / cellSize));
   const rowCount = Math.ceil(totalNumbers / columnCount);
 
-  const Cell = ({ columnIndex, rowIndex, style }) => {
+  interface CellProps {
+    columnIndex: number;
+    rowIndex: number;
+    style: React.CSSProperties;
+  }
+
+  const Cell: React.FC<CellProps> = ({ columnIndex, rowIndex, style }) => {
     const number = rowIndex * columnCount + columnIndex + 1;
     if (number > totalNumbers) return null;
 
     const isSelected = selectedNumbers.includes(number);
-    const isWinning = number === winningNumber;
+    // const isWinning = number === winningNumber;
 
     return (
       <div
-      className={(isSelected) ? 'is-disabled' : ''}
+        className={isSelected ? "is-disabled" : ""}
         style={{
           ...style,
+          border: "1px solid #ddd",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: guessed ? "not-allowed" : "pointer",
+          fontSize: "14px",
           // backgroundColor: isWinning
           //   ? "#ffd700"
           //   : isSelected
           //   ? "#add8e6"
           //   : "#fff",
-          border: "1px solid #ddd",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           // fontWeight: isWinning ? "bold" : "normal",
-          cursor: "pointer",
-          fontSize: "14px",
+          // pointerEvents: guessed ? "none" : "auto",
         }}
         onClick={() => {
+          if (guessed) return;
           setSelectedNumber(number);
           if (number === winningNumber) {
             setShowFireworks(true);
-            setTimeout(() => setShowFireworks(false), 10000);
+            setTimeout(() => setShowFireworks(false), 30000);
           }
           setGuessed(true);
-          setResult(number === winningNumber ? "🎉 You Win!" : "Not Today. Try Again Tomorrow");
+          setResult(
+            number === winningNumber
+              ? "🎉 You Win!"
+              : "Not Today. Try Again Tomorrow"
+          );
         }}
       >
         {number}
@@ -82,11 +94,7 @@ function App() {
         <p>{result}</p>
         {showFireworks && (
           <div className="victory-overlay">
-            <div
-              style={{
-                minHeight: 200,
-              }}
-            >
+            <div style={{ minHeight: 200 }}>
               <Confetti
                 gravity={0.1}
                 height={928}
@@ -104,9 +112,7 @@ function App() {
           </div>
         )}
       </header>
-
-      {/* <div className="grid-container"> */}
-      <div className={`grid-container ${guessed ? 'table-is-disabled': ''}`}>
+      <div className={`grid-container ${guessed ? "table-is-disabled" : ""}`}>
         <Grid
           columnCount={columnCount}
           columnWidth={cellSize}
